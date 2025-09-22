@@ -26,9 +26,9 @@ const swaggerOptions = {
     swaggerDefinition: {
         openapi: '3.0.0',
         info: {
-            title: 'CRUD API with Express and TypeORM',
+            title: 'CRUD API with Express',
             version: '1.0.0',
-            description: 'A simple CRUD API for managing users.',
+            description: 'A simple CRUD API for managing users',
         },
         servers: [
             {
@@ -36,6 +36,15 @@ const swaggerOptions = {
             },
         ],
         components: {
+
+            // Security: Basic Auth
+            securitySchemes: {
+                basicAuth: {
+                    type: 'http',
+                    scheme: 'basic',
+                },
+            },
+
             schemas: {
                 User: {
                     type: 'object',
@@ -55,6 +64,14 @@ const swaggerOptions = {
                 },
             },
         },
+
+        // Security: Basic Auth
+        security: [
+            {
+                basicAuth: [], // Must match the name in securitySchemes
+            },
+        ],
+
     },
     apis: ['./src/routes/*.ts'], // Path to the API docs
 };

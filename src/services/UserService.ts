@@ -60,6 +60,13 @@ export class UserService {
         return toUserResponse(newUser);
     }
 
+
+    // Security: Basic Auth
+    async findByEmail(email: string): Promise<User | null> {
+        return userRepository.findOne({ where: { email } });
+    }
+
+
     async update(id: number, payload: Partial<UserCreatePayload>): Promise<UserResponse | null> {
         const user = await userRepository.findOneBy({ userId: id });
         if (!user) return null;

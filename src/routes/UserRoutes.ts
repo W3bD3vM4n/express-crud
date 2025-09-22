@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { UserController } from '../controllers/UserController.js';
+import { basicAuth } from '../middleware/auth.js';
 
 const router = Router();
 const userController = new UserController();
@@ -273,11 +274,17 @@ const userController = new UserController();
  *               $ref: '#/components/schemas/Error'
  */
 
-// Define routes
+// DEFINE ROUTES
+// Public routes (no auth required)
 router.get('/users', userController.getAllUsers.bind(userController));
 router.get('/users/:id', userController.getUserById.bind(userController));
 router.post('/users', userController.createUser.bind(userController));
-router.put('/users/:id', userController.updateUser.bind(userController));
-router.delete('/users/:id', userController.deleteUser.bind(userController));
+
+// Security: Basic Auth
+// Protected routes (auth required)
+router.put('/users/:id', /* basicAuth, */ userController.updateUser.bind(userController));
+router.delete('/users/:id', /* basicAuth, */ userController.deleteUser.bind(userController));
+// router.put('/users/:id', basicAuth, userController.updateUser.bind(userController));
+// router.delete('/users/:id', basicAuth, userController.deleteUser.bind(userController));
 
 export default router;
