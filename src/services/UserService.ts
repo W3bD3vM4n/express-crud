@@ -61,7 +61,7 @@ export class UserService {
     }
 
 
-    // Security: Basic Auth
+    // Security: Basic Auth & JSON Web Tokens (JWT)
     async findByEmail(email: string): Promise<User | null> {
         return userRepository.findOne({ where: { email } });
     }

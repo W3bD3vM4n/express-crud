@@ -38,10 +38,19 @@ const swaggerOptions = {
         components: {
 
             // Security: Basic Auth
+            // securitySchemes: {
+            //     basicAuth: {
+            //         type: 'http',
+            //         scheme: 'basic',
+            //     },
+            // },
+
+            // Security: JSON Web Tokens (JWT)
             securitySchemes: {
-                basicAuth: {
+                bearerAuth: {
                     type: 'http',
-                    scheme: 'basic',
+                    scheme: 'bearer',
+                    bearerFormat: 'JWT',
                 },
             },
 
@@ -66,9 +75,16 @@ const swaggerOptions = {
         },
 
         // Security: Basic Auth
+        // security: [
+        //     {
+        //         basicAuth: [], // Must match the name in securitySchemes
+        //     },
+        // ],
+
+        // Security: JSON Web Tokens (JWT)
         security: [
             {
-                basicAuth: [], // Must match the name in securitySchemes
+                bearerAuth: [],
             },
         ],
 

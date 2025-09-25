@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { UserController } from '../controllers/UserController.js';
-import { basicAuth } from '../middleware/auth.js';
+// import { basicAuth } from '../middleware/auth.js';
+import { jwtAuth } from '../middleware/jwtAuth.js';
 
 const router = Router();
 const userController = new UserController();
@@ -274,17 +275,66 @@ const userController = new UserController();
  *               $ref: '#/components/schemas/Error'
  */
 
+/**
+ * @swagger
+ * /users/login:
+ *   post:
+ *     summary: Log in a user to get a JWT
+ *     tags: [Users]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - password
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 description: The user's email address
+ *               password:
+ *                 type: string
+ *                 description: The user's password
+ *     responses:
+ *       200:
+ *         description: Login successful, JWT returned
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 token:
+ *                   type: string
+ *       400:
+ *         description: Bad request (e.g., missing email or password)
+ *       401:
+ *         description: Invalid credentials
+ */
+
 // DEFINE ROUTES
 // Public routes (no auth required)
 router.get('/users', userController.getAllUsers.bind(userController));
 router.get('/users/:id', userController.getUserById.bind(userController));
 router.post('/users', userController.createUser.bind(userController));
 
-// Security: Basic Auth
+// Security: JSON Web Tokens (JWT)
+router.post('/users/login', userController.login.bind(userController));
+
 // Protected routes (auth required)
-router.put('/users/:id', /* basicAuth, */ userController.updateUser.bind(userController));
-router.delete('/users/:id', /* basicAuth, */ userController.deleteUser.bind(userController));
+// router.put('/users/:id', userController.updateUser.bind(userController));
+// router.delete('/users/:id', userController.deleteUser.bind(userController));
+
+// Security: Basic Auth
 // router.put('/users/:id', basicAuth, userController.updateUser.bind(userController));
 // router.delete('/users/:id', basicAuth, userController.deleteUser.bind(userController));
+
+// Security: JSON Web Tokens (JWT)
+router.put('/users/:id', jwtAuth, userController.updateUser.bind(userController));
+router.delete('/users/:id', jwtAuth, userController.deleteUser.bind(userController));
 
 export default router;
