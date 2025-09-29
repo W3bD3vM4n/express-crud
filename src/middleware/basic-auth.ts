@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { UserService } from '../services/UserService.js';
+import { UserService } from '../services/user.service.js';
 import bcrypt from 'bcrypt';
 
 const userService = new UserService();

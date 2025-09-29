@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { UserService } from '../services/UserService.js';
+import { UserService } from '../services/user.service.js';
 import * as bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 
@@ -22,7 +22,7 @@ const parseIdParam = (idParam: string | undefined): { id: number; error?: string
 export class UserController {
     async getAllUsers(req: Request, res: Response) {
         try {
-            const users = await userService.getAll();
+            const users = await userService.getAllFromRepository();
             res.status(200).json(users);
         } catch (error) {
             res.status(500).json({ message: 'Error fetching users', error })
@@ -36,7 +36,7 @@ export class UserController {
                 return res.status(400).json({ message: error });
             }
 
-            const user = await userService.getById(id);
+            const user = await userService.getByIdFromRepository(id);
             if (!user) {
                 return res.status(404).json({ message: 'User not found' });
             }
@@ -49,7 +49,7 @@ export class UserController {
 
     async createUser(req: Request, res: Response) {
         try {
-            const newUser = await userService.create(req.body);
+            const newUser = await userService.createFromRepository(req.body);
             res.status(201).json(newUser);
         } catch (error) {
             res.status(400).json({ message: 'Error creating user', error });
@@ -63,7 +63,7 @@ export class UserController {
                 return res.status(400).json({ message: error });
             }
 
-            const updatedUser = await userService.update(id, req.body);
+            const updatedUser = await userService.updateFromRepository(id, req.body);
             if (!updatedUser) {
                 return res.status(404).json({ message: 'User not found' });
             }
@@ -81,7 +81,7 @@ export class UserController {
                 return res.status(400).json({ message: error });
             }
 
-            await userService.delete(id);
+            await userService.deleteFromRepository(id);
             res.status(204).send();
         } catch (error) {
             res.status(500).json({ message: 'Error deleting user', error });

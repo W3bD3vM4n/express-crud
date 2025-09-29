@@ -1,6 +1,6 @@
 import express from 'express';
 import { AppDataSource } from './data-source.js';
-import userRoutes from './routes/UserRoutes.js';
+import userRoutes from './routes/user.route.js';
 
 // Swagger imports
 import swaggerUi from 'swagger-ui-express';
