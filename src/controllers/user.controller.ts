@@ -5,20 +5,6 @@ import jwt from 'jsonwebtoken';
 
 const userService = new UserService();
 
-// Helper function to parse and validate ID parameter
-const parseIdParam = (idParam: string | undefined): { id: number; error?: string } => {
-    if (!idParam) {
-        return { id: 0, error: 'User ID is required' };
-    }
-
-    const id = parseInt(idParam, 10);
-    if (isNaN(id)) {
-        return { id: 0, error: 'Invalid user ID format' };
-    }
-
-    return { id };
-};
-
 export class UserController {
     async getAllUsers(req: Request, res: Response) {
         try {
@@ -31,10 +17,7 @@ export class UserController {
 
     async getUserById(req: Request, res: Response) {
         try {
-            const { id, error } = parseIdParam(req.params.id);
-            if (error) {
-                return res.status(400).json({ message: error });
-            }
+            const id = Number(req.params.id);
 
             const user = await userService.getByIdFromRepository(id);
             if (!user) {
@@ -58,10 +41,7 @@ export class UserController {
 
     async updateUser(req: Request, res: Response) {
         try {
-            const { id, error } = parseIdParam(req.params.id);
-            if (error) {
-                return res.status(400).json({ message: error });
-            }
+            const id = Number(req.params.id);
 
             const updatedUser = await userService.updateFromRepository(id, req.body);
             if (!updatedUser) {
@@ -76,10 +56,7 @@ export class UserController {
 
     async deleteUser(req: Request, res: Response) {
         try {
-            const { id, error } = parseIdParam(req.params.id);
-            if (error) {
-                return res.status(400).json({ message: error });
-            }
+            const id = Number(req.params.id);
 
             await userService.deleteFromRepository(id);
             res.status(204).send();

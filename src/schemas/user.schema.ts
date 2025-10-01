@@ -69,7 +69,7 @@ export const IdParamSchema = z.object({
 });
 
 // Type inference
-export type LoginInput = z.infer<typeof LoginSchema>;
-export type CreateUserInput = z.infer<typeof CreateUserSchema>;
-export type UpdateUserInput = z.infer<typeof UpdateUserSchema>;
-export type UserResponse = z.infer<typeof UserResponseSchema>;
+export type LoginInputZod = z.infer<typeof LoginSchema>;
+export type CreateUserZod = z.infer<typeof CreateUserSchema>;
+export type UpdateUserZod = z.infer<typeof UpdateUserSchema>;
+export type UserResponseZod = z.infer<typeof UserResponseSchema>;
