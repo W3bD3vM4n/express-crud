@@ -1,4 +1,4 @@
-import { AppDataSource } from '../data-source.js';
+import { AppDataSource } from '../data-source.js'; // Database connection using TypeORM
 import { User } from '../entities/user.js';
 import { CreateUserDto, UpdateUserDto, UserResponseDto } from '../dto/user.dto.js';
 

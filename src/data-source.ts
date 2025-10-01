@@ -3,6 +3,7 @@ import 'dotenv/config';
 import { DataSource } from 'typeorm';
 import { User } from './entities/user.js';
 
+// `process` it's a special JavaScript object that holds all the env
 const { DB_HOST, DB_PORT, DB_USERNAME, DB_PASSWORD, DB_DATABASE } = process.env;
 
 // Validate required environment variables
@@ -10,6 +11,7 @@ if (!DB_HOST || !DB_PORT || !DB_USERNAME || !DB_PASSWORD || !DB_DATABASE) {
     throw new Error('Missing database environment variables');
 }
 
+// TypeORM is the core connection manager with the database
 export const AppDataSource = new DataSource({
     type: 'postgres',
     host: DB_HOST,

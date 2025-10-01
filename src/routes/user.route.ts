@@ -2,339 +2,217 @@ import { Router } from 'express';
 import { UserController } from '../controllers/user.controller.js';
 // import { basicAuth } from '../middleware/auth.js';
 import { jwtAuth } from '../middleware/jwt-auth.js';
+import { validate, validateParams } from '../middleware/validate.js';
+import {
+    CreateUserSchema,
+    UpdateUserSchema,
+    LoginSchema,
+    IdParamSchema,
+    UserResponseSchema,
+} from '../schemas/user.schema.js';
+
+// Import the OpenAPI Registry
+import { OpenAPIRegistry } from '@asteasolutions/zod-to-openapi';
+import { z } from 'zod';
+
+// Create a registry for this module
+export const userRegistry = new OpenAPIRegistry();
+
+// Register your schemas
+userRegistry.register('CreateUserRequest', CreateUserSchema);
+userRegistry.register('UpdateUserRequest', UpdateUserSchema);
+userRegistry.register('LoginRequest', LoginSchema);
+userRegistry.register('UserResponse', UserResponseSchema);
 
 const router = Router();
 const userController = new UserController();
 
-/**
- * @swagger
- * components:
- *   schemas:
- *     User:
- *       type: object
- *       required:
- *         - firstName
- *         - lastName
- *         - email
- *         - password
- *         - role
- *       properties:
- *         user_id:
- *           type: integer
- *           description: The auto-generated id of the user
- *         firstName:
- *           type: string
- *           description: The user's first name
- *         lastName:
- *           type: string
- *           description: The user's last name
- *         email:
- *           type: string
- *           format: email
- *           description: The user's email address
- *         password:
- *           type: string
- *           description: The user's password
- *         role:
- *           type: string
- *           enum: [participant, organizer, admin]
- *           description: The user's role
- *         created_at:
- *           type: string
- *           format: date-time
- *           description: The date the user was created
- *     UserInput:
- *       type: object
- *       required:
- *         - firstName
- *         - lastName
- *         - email
- *         - password
- *         - role
- *       properties:
- *         firstName:
- *           type: string
- *           description: The user's first name
- *         lastName:
- *           type: string
- *           description: The user's last name
- *         email:
- *           type: string
- *           format: email
- *           description: The user's email address
- *         password:
- *           type: string
- *           description: The user's password
- *         role:
- *           type: string
- *           enum: [participant, organizer, admin]
- *           description: The user's role
- *     UserResponse:
- *       type: object
- *       properties:
- *         user_id:
- *           type: integer
- *           description: The auto-generated id of the user
- *         firstName:
- *           type: string
- *           description: The user's first name
- *         lastName:
- *           type: string
- *           description: The user's last name
- *         email:
- *           type: string
- *           format: email
- *           description: The user's email address
- *         role:
- *           type: string
- *           enum: [participant, organizer, admin]
- *           description: The user's role
- *         created_at:
- *           type: string
- *           format: date-time
- *           description: The date the user was created
- *     Error:
- *       type: object
- *       properties:
- *         message:
- *           type: string
- *           description: Error message
- *         error:
- *           type: object
- *           description: Additional error details
- */
+// DEFINE ROUTES AND DOCUMENTATION
 
-/**
- * @swagger
- * tags:
- *   name: Users
- *   description: User management API
- */
-
-/**
- * @swagger
- * /users:
- *   get:
- *     summary: Get all users
- *     tags: [Users]
- *     responses:
- *       200:
- *         description: List of all users
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/UserResponse'
- *       500:
- *         description: Internal server error
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Error'
- *   post:
- *     summary: Create a new user
- *     tags: [Users]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/UserInput'
- *     responses:
- *       201:
- *         description: User created successfully
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/UserResponse'
- *       400:
- *         description: Bad request
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Error'
- */
-
-/**
- * @swagger
- * /users/{id}:
- *   get:
- *     summary: Get user by ID
- *     tags: [Users]
- *     parameters:
- *       - in: path
- *         name: id
- *         schema:
- *           type: integer
- *         required: true
- *         description: Numeric ID of the user to get
- *     responses:
- *       200:
- *         description: User found
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/UserResponse'
- *       400:
- *         description: Invalid user ID format
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Error'
- *       404:
- *         description: User not found
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Error'
- *       500:
- *         description: Internal server error
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Error'
- *   put:
- *     summary: Update user by ID
- *     tags: [Users]
- *     parameters:
- *       - in: path
- *         name: id
- *         schema:
- *           type: integer
- *         required: true
- *         description: Numeric ID of the user to update
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               firstName:
- *                 type: string
- *               lastName:
- *                 type: string
- *               email:
- *                 type: string
- *                 format: email
- *               password:
- *                 type: string
- *               role:
- *                 type: string
- *                 enum: [participant, organizer, admin]
- *     responses:
- *       200:
- *         description: User updated successfully
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/UserResponse'
- *       400:
- *         description: Invalid user ID format
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Error'
- *       404:
- *         description: User not found
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Error'
- *       500:
- *         description: Internal server error
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Error'
- *   delete:
- *     summary: Delete user by ID
- *     tags: [Users]
- *     parameters:
- *       - in: path
- *         name: id
- *         schema:
- *           type: integer
- *         required: true
- *         description: Numeric ID of the user to delete
- *     responses:
- *       204:
- *         description: User deleted successfully
- *       400:
- *         description: Invalid user ID format
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Error'
- *       500:
- *         description: Internal server error
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Error'
- */
-
-/**
- * @swagger
- * /users/login:
- *   post:
- *     summary: Log in a user to get a JWT
- *     tags: [Users]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - email
- *               - password
- *             properties:
- *               email:
- *                 type: string
- *                 format: email
- *                 description: The user's email address
- *               password:
- *                 type: string
- *                 description: The user's password
- *     responses:
- *       200:
- *         description: Login successful, JWT returned
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                 token:
- *                   type: string
- *       400:
- *         description: Bad request (e.g., missing email or password)
- *       401:
- *         description: Invalid credentials
- */
-
-// DEFINE ROUTES
 // Public routes (no auth required)
+// READ
+userRegistry.registerPath({
+    method: 'get',
+    path: '/users',
+    summary: 'Get all users',
+    tags: ['Users'],
+    responses: {
+        200: {
+            description: 'List of all users',
+            content: {
+                'application/json': {
+                    schema: z.array(UserResponseSchema),
+                },
+            },
+        },
+    },
+});
 router.get('/users', userController.getAllUsers.bind(userController));
-router.get('/users/:id', userController.getUserById.bind(userController));
-router.post('/users', userController.createUser.bind(userController));
+
+userRegistry.registerPath({
+    method: 'get',
+    path: '/users/{id}',
+    summary: 'Get a single user by ID',
+    tags: ['Users'],
+    request: {
+        params: IdParamSchema,
+    },
+    responses: {
+        200: {
+            description: 'User data',
+            content: {
+                'application/json': {
+                    schema: UserResponseSchema,
+                },
+            },
+        },
+        404: {
+            description: 'User not found',
+        },
+    },
+});
+router.get('/users/:id',
+    validateParams(IdParamSchema),
+    userController.getUserById.bind(userController)
+);
+
+// CREATE
+userRegistry.registerPath({
+    method: 'post',
+    path: '/users',
+    summary: 'Create a new user',
+    tags: ['Users'],
+    request: {
+        body: {
+            content: {
+                'application/json': {
+                    schema: CreateUserSchema,
+                },
+            },
+        },
+    },
+    responses: {
+        201: {
+            description: 'User created successfully',
+            content: {
+                'application/json': {
+                    schema: UserResponseSchema,
+                },
+            },
+        },
+    },
+});
+router.post('/users',
+    validate(CreateUserSchema),
+    userController.createUser.bind(userController)
+);
 
 // Security: JSON Web Tokens (JWT)
-router.post('/users/login', userController.login.bind(userController));
+userRegistry.registerPath({
+    method: 'post',
+    path: '/users/login',
+    summary: 'User login',
+    tags: ['Users'],
+    request: {
+        body: {
+            content: {
+                'application/json': {
+                    schema: LoginSchema,
+                },
+            },
+        },
+    },
+    responses: {
+        200: {
+            description: 'Login successfully',
+            content: {
+                'application/json': {
+                    schema: z.object({
+                        message: z.string(),
+                        token: z.string(),
+                    }),
+                },
+            },
+        },
+    },
+});
+router.post('/users/login',
+    validate(LoginSchema),
+    userController.login.bind(userController)
+);
 
 // Protected routes (auth required)
+// UPDATE
+userRegistry.registerPath({
+    method: 'put',
+    path: '/users/{id}',
+    summary: 'Update a user',
+    tags: ['Users'],
+    security: [{ bearerAuth: [] }], // This marks the route as protected
+    request: {
+        params: IdParamSchema,
+        body: {
+            content: {
+                'application/json': {
+                    schema: UpdateUserSchema,
+                },
+            },
+        },
+    },
+    responses: {
+        200: {
+            description: 'User updated successfully',
+            content: {
+                'application/json': {
+                    schema: UserResponseSchema,
+                },
+            },
+        },
+        401: {
+            description: 'Unauthorized',
+        },
+        404: {
+            description: 'User not found',
+        },
+    },
+});
 // router.put('/users/:id', userController.updateUser.bind(userController));
-// router.delete('/users/:id', userController.deleteUser.bind(userController));
-
-// Security: Basic Auth
 // router.put('/users/:id', basicAuth, userController.updateUser.bind(userController));
-// router.delete('/users/:id', basicAuth, userController.deleteUser.bind(userController));
+router.put('/users/:id',
+    jwtAuth,
+    validateParams(IdParamSchema),
+    validate(UpdateUserSchema),
+    userController.updateUser.bind(userController)
+);
 
-// Security: JSON Web Tokens (JWT)
-router.put('/users/:id', jwtAuth, userController.updateUser.bind(userController));
-router.delete('/users/:id', jwtAuth, userController.deleteUser.bind(userController));
+//DELETE
+userRegistry.registerPath({
+    method: 'delete',
+    path: '/users/{id}',
+    summary: 'Delete a user',
+    tags: ['Users'],
+    security: [{ bearerAuth: [] }],
+    request: {
+        params: IdParamSchema,
+    },
+    responses: {
+        204: {
+            description: 'User deleted successfully',
+        },
+        401: {
+            description: 'Unauthorized',
+        },
+        404: {
+            description: 'User not found',
+        },
+    },
+});
+// router.delete('/users/:id', userController.deleteUser.bind(userController));
+// router.delete('/users/:id', basicAuth, userController.deleteUser.bind(userController));
+router.delete('/users/:id',
+    jwtAuth,
+    validateParams(IdParamSchema),
+    userController.deleteUser.bind(userController)
+);
 
 export default router;
