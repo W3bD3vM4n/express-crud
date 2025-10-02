@@ -17,6 +17,7 @@ const toUserResponse = (user: User): UserResponseZod => {
         lastName: user.lastName,
         email: user.email,
         role: user.role,
+        status: user.status,
         createdAt: user.createdAt,
     };
 };

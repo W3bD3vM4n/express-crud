@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
-import { UserRole } from '../entities/user.js';
+import { UserRole, UserStatus } from '../entities/user.js';
 
 extendZodWithOpenApi(z);
 
@@ -39,8 +39,12 @@ export const CreateUserSchema = z.object({
         }),
     role: z.nativeEnum(UserRole).openapi({
         description: 'User role',
-        example: UserRole.PARTICIPANT
-    })
+        example: UserRole.USER
+    }),
+    status: z.nativeEnum(UserStatus).openapi({
+        description: 'User status',
+        example: UserStatus.ACTIVE
+    }),
 }).openapi('CreateUserRequest');
 
 // Update user schema (all fields optional)
@@ -55,7 +59,8 @@ export const UserResponseSchema = z.object({
     firstName: z.string().openapi({ example: 'John' }),
     lastName: z.string().openapi({ example: 'Doe' }),
     email: z.string().email().openapi({ example: 'john.doe@example.com' }),
-    role: z.nativeEnum(UserRole).openapi({ example: UserRole.PARTICIPANT }),
+    role: z.nativeEnum(UserRole).openapi({ example: UserRole.USER }),
+    status: z.nativeEnum(UserStatus).openapi({ example: UserStatus.ACTIVE }),
     createdAt: z.date().openapi({
         description: 'Account creation date',
         type: 'string',

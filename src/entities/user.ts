@@ -10,12 +10,25 @@ import * as bcrypt from 'bcrypt';
 
 // Define an enum for the user roles
 export enum UserRole {
-    PARTICIPANT = 'participant',
-    ORGANIZER = 'organizer',
+    USER = 'user',
     ADMIN = 'admin',
 }
 
-@Entity('users') // Map this entity to the 'users' table
+export enum UserStatus {
+    ACTIVE = 'active',
+    SUSPENDED = 'suspended',
+    BANNED= 'banned',
+}
+
+// Used for the `posts` table
+export enum PostStatus {
+    PENDING = 'pending',
+    APPROVED = 'approved',
+    REJECTED = 'rejected',
+}
+
+// Map this entity to the `users` table
+@Entity('users')
 export class User {
     // SERIAL PRIMARY KEY
     // TypeORM handles 'increment' for postgres
@@ -34,8 +47,11 @@ export class User {
     @Column({ type: 'varchar', length: 200 })
     password!: string;
 
-    @Column({ type: 'varchar', length: 50 })
+    @Column({ type: 'enum', enum: UserRole })
     role!: UserRole;
+
+    @Column({ type: 'enum', enum: UserStatus })
+    status!: UserStatus;
 
     @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', name: 'created_at' })
     createdAt!: Date;
