@@ -1,4 +1,6 @@
 import { OpenAPIRegistry, OpenApiGeneratorV3 } from '@asteasolutions/zod-to-openapi';
+import { categoryRegistry } from '../routes/category.route.js';
+import { postRegistry } from '../routes/post.route.js';
 import { userRegistry } from '../routes/user.route.js';
 
 // Create a local registry for components
@@ -11,9 +13,11 @@ componentsRegistry.registerComponent('securitySchemes', 'bearerAuth', {
     bearerFormat: 'JWT'
 });
 
-// Create a combined registry by passing all other registries to the constructor
+// Pass all registries into the main registry (constructor)
 const mainRegistry = new OpenAPIRegistry([
     componentsRegistry,
+    categoryRegistry,
+    postRegistry,
     userRegistry,
 ]);
 

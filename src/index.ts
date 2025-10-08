@@ -1,5 +1,7 @@
 import express from 'express';
 import { AppDataSource } from './data-source.js';
+import categoryRoutes from './routes/category.route.js';
+import postRoutes from './routes/post.route.js';
 import userRoutes from './routes/user.route.js';
 
 // Swagger imports
@@ -25,7 +27,9 @@ app.use(express.json());
 const swaggerDocs = generateOpenAPIDocument();
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
-// Register API routes
+// Register all API routes
+app.use('/api', categoryRoutes);
+app.use('/api', postRoutes);
 app.use('/api', userRoutes);
 
 // Start the server

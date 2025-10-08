@@ -4,8 +4,10 @@ import {
     Column,
     CreateDateColumn,
     BeforeInsert,
-    BeforeUpdate
+    BeforeUpdate,
+    OneToMany,
 } from 'typeorm';
+// import { Post } from './post.js';
 import * as bcrypt from 'bcrypt';
 
 // Define an enum for the user roles
@@ -65,4 +67,7 @@ export class User {
             this.password = bcrypt.hashSync(this.password, 10);
         }
     }
+
+    @OneToMany('Post', (post: any) => post.user)
+    posts!: any[];
 }

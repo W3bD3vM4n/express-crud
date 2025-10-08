@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
+import { UserRole } from '../entities/user.js';
 
 export const jwtAuth = (req: Request, res: Response, next: NextFunction) => {
     const authHeader = req.headers.authorization;
@@ -12,6 +13,7 @@ export const jwtAuth = (req: Request, res: Response, next: NextFunction) => {
 
     try {
         const decoded = jwt.verify(token || '', process.env.JWT_SECRET!);
+        req.user = decoded as { userId: number; email: string; role: UserRole };
         next();
     } catch (error) {
         if (error instanceof jwt.TokenExpiredError) {

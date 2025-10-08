@@ -1,6 +1,8 @@
 import 'reflect-metadata';
 import 'dotenv/config';
 import { DataSource } from 'typeorm';
+import { Category } from './entities/category.js';
+import { Post } from './entities/post.js';
 import { User } from './entities/user.js';
 
 // `process` it's a special JavaScript object that holds all the env
@@ -22,7 +24,7 @@ export const AppDataSource = new DataSource({
     // synchronize: true should be false in production
     synchronize: true, // Automatically creates database schema on every application launch
     logging: false, // Set to true to see SQL queries in the console
-    entities: [User], // List of all your entity classes
+    entities: [Category, Post, User], // List of all your entity classes
     migrations: [],
     subscribers: [],
 });
