@@ -1,10 +1,15 @@
 import { z } from 'zod';
 import { extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
 import { PostStatus } from '../entities/user.js';
-import { UserResponseSchema } from './user.schema.js';
+import { GetUserSchema } from './user.schema.js';
 import { GetCategorySchema } from './category.schema.js';
 
 extendZodWithOpenApi(z);
+
+// ID parameter validation
+export const IdParamSchema = z.object({
+    id: z.string().regex(/^\d+$/, 'ID must be a number').transform(Number)
+});
 
 // 1. Base Schema: Mirrors the table `Post`
 export const PostSchema = z.object({
@@ -53,7 +58,7 @@ export const CreatePostSchema = PostSchema.pick({
 export const GetPostSchema = PostSchema.extend({
     // Nest a simplified user object
     // Nullable in case the author's account is deleted
-    user: UserResponseSchema.pick({
+    user: GetUserSchema.pick({
         userId: true,
         firstName: true,
         lastName: true,
@@ -70,11 +75,6 @@ export const GetPostSchema = PostSchema.extend({
 // Fields are made optional because a user might only want to update some
 // It's not used unless you want to add admin editing later
 // export const UpdatePostSchema = CreatePostSchema.partial().openapi('UpdatePostRequest');
-
-// ID parameter validation
-export const IdParamSchema = z.object({
-    id: z.string().regex(/^\d+$/, 'ID must be a number').transform(Number)
-});
 
 // 5. Type Inference for TypeScript
 export type CreatePostZod = z.infer<typeof CreatePostSchema>;

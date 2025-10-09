@@ -4,32 +4,34 @@ import { UserController } from '../controllers/user.controller.js';
 import { jwtAuth } from '../middleware/jwt-auth.js';
 import { validate, validateParams } from '../middleware/validate.js';
 import {
-    CreateUserSchema,
-    UpdateUserSchema,
-    LoginSchema,
     IdParamSchema,
-    UserResponseSchema,
+    LoginSchema,
+    CreateUserSchema,
+    GetUserSchema,
+    UpdateUserSchema,
 } from '../schemas/user.schema.js';
 
-// Import the OpenAPI Registry
+// 1. Import the OpenAPI Registry
 import { OpenAPIRegistry } from '@asteasolutions/zod-to-openapi';
 import { z } from 'zod';
 
-// Create a registry for this module
+// 2. Create a registry for this module
 export const userRegistry = new OpenAPIRegistry();
 
-// Register your schemas
+// 3. Register the schemas (OpenAPI Documentation)
 userRegistry.register('CreateUserRequest', CreateUserSchema);
 userRegistry.register('UpdateUserRequest', UpdateUserSchema);
 userRegistry.register('LoginRequest', LoginSchema);
-userRegistry.register('UserResponse', UserResponseSchema);
+userRegistry.register('UserResponse', GetUserSchema);
 
+// The entire router uses the authorize middleware
+// to ensure only admins can access these endpoints
 const router = Router();
 const userController = new UserController();
 
-// DEFINE ROUTES AND DOCUMENTATION
+// 4. Define routes and documentation
 
-// Public routes (no auth required)
+// 4.1 Public routes (no auth required)
 // READ
 userRegistry.registerPath({
     method: 'get',
@@ -41,7 +43,7 @@ userRegistry.registerPath({
             description: 'List of all users',
             content: {
                 'application/json': {
-                    schema: z.array(UserResponseSchema),
+                    schema: z.array(GetUserSchema),
                 },
             },
         },
@@ -62,7 +64,7 @@ userRegistry.registerPath({
             description: 'User data',
             content: {
                 'application/json': {
-                    schema: UserResponseSchema,
+                    schema: GetUserSchema,
                 },
             },
         },
@@ -96,7 +98,7 @@ userRegistry.registerPath({
             description: 'User created successfully',
             content: {
                 'application/json': {
-                    schema: UserResponseSchema,
+                    schema: GetUserSchema,
                 },
             },
         },
@@ -141,7 +143,7 @@ router.post('/users/login',
     userController.login.bind(userController)
 );
 
-// Protected routes (auth required)
+// 4.2 Protected routes (auth required)
 // UPDATE
 userRegistry.registerPath({
     method: 'put',
@@ -164,7 +166,7 @@ userRegistry.registerPath({
             description: 'User updated successfully',
             content: {
                 'application/json': {
-                    schema: UserResponseSchema,
+                    schema: GetUserSchema,
                 },
             },
         },

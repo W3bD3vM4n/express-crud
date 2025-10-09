@@ -30,7 +30,7 @@ export class Post {
     @UpdateDateColumn({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP', name: 'updated_at' })
     updatedAt!: Date;
 
-    // --- Relationships ---
+    // Relationships
     @Column({ name: 'user_id', nullable: true })
     userId!: number | null;
 

@@ -106,7 +106,7 @@ export class PostController {
         }
     }
 
-    // ADMIN METHODS
+    // ADMIN
     async getPending(req: Request, res: Response) {
         try {
             const posts = await postService.findPending();

@@ -1,16 +1,11 @@
 import { AppDataSource } from '../data-source.js'; // Database connection using TypeORM
 import { User } from '../entities/user.js';
-import { CreateUserZod, UpdateUserZod, UserResponseZod } from '../schemas/user.schema.js';
+import { CreateUserZod, UpdateUserZod, GetUserZod } from '../schemas/user.schema.js';
 
 const userRepository = AppDataSource.getRepository(User);
 
-/**
- * Helper function to convert a database User entity to the public-facing UserResponse type.
- * This is crucial for hiding sensitive data like the password.
- * @param user The User entity from the database.
- * @returns An object matching the UserResponse Zod schema.
- */
-const toUserResponse = (user: User): UserResponseZod => {
+// Convert the Entity to the UserResponse type
+const toUserResponse = (user: User): GetUserZod => {
     return {
         userId: user.userId,
         firstName: user.firstName,
@@ -23,14 +18,27 @@ const toUserResponse = (user: User): UserResponseZod => {
 };
 
 export class UserService {
-    // The return type is now an array of the Zod 'UserResponse' type
-    async getAllFromRepository(): Promise<UserResponseZod[]> {
+    // LOGIN
+    // Security: Basic Auth & JSON Web Tokens (JWT)
+    async findByEmail(email: string): Promise<User | null> {
+        return userRepository.findOne({ where: { email } });
+    }
+
+    // CREATE
+    async createFromRepository(create: CreateUserZod): Promise<GetUserZod> {
+        const user = userRepository.create(create); // .create() is a safe way to map input to an entity
+
+        const newUser = await userRepository.save(user);
+        return toUserResponse(newUser);
+    }
+
+    // READ
+    async getAllFromRepository(): Promise<GetUserZod[]> {
         const users = await userRepository.find();
         return users.map(toUserResponse);
     }
 
-    // The return type is now the Zod 'UserResponse' type
-    async getByIdFromRepository(id: number): Promise<UserResponseZod | null> {
+    async getByIdFromRepository(id: number): Promise<GetUserZod | null> {
         const user = await userRepository.findOneBy({ userId: id });
         if (user) {
             return toUserResponse(user);
@@ -38,23 +46,8 @@ export class UserService {
         return null;
     }
 
-    // The input 'create' parameter now uses the Zod 'CreateUserInput' type
-    async createFromRepository(create: CreateUserZod): Promise<UserResponseZod> {
-        const user = userRepository.create(create); // .create() is a safe way to map input to an entity
-
-        const newUser = await userRepository.save(user);
-        return toUserResponse(newUser);
-    }
-
-
-    // Security: Basic Auth & JSON Web Tokens (JWT)
-    async findByEmail(email: string): Promise<User | null> {
-        return userRepository.findOne({ where: { email } });
-    }
-
-
-    // The input 'update' parameter now uses the Zod 'UpdateUserInput' type
-    async updateFromRepository(id: number, update: UpdateUserZod): Promise<UserResponseZod | null> {
+    // UPDATE
+    async updateFromRepository(id: number, update: UpdateUserZod): Promise<GetUserZod | null> {
         const user = await userRepository.findOneBy({ userId: id });
         if (!user) return null;
 
@@ -65,6 +58,7 @@ export class UserService {
         return toUserResponse(updatedUser);
     }
 
+    // DELETE
     async deleteFromRepository(id: number) {
         const result = await userRepository.delete(id);
         return result;

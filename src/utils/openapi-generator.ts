@@ -48,10 +48,15 @@ export function generateOpenAPIDocument() {
         // ],
 
         // Security: JSON Web Tokens (JWT)
-        security: [
-            {
-                bearerAuth: [],
-            },
-        ],
+        /**
+         * This makes the authentication to be required globally
+         * on every Endpoint, even the ones that are not required
+         * to have it (making everything to return: Error 401)
+         */
+        // security: [
+        //     {
+        //         bearerAuth: [],
+        //     },
+        // ],
     });
 }

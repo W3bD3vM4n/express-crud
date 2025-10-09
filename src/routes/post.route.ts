@@ -5,9 +5,9 @@ import { authorize } from '../middleware/authorize.js';
 import { validate, validateParams } from '../middleware/validate.js';
 import { UserRole, PostStatus } from '../entities/user.js';
 import {
+    IdParamSchema,
     CreatePostSchema,
-    GetPostSchema,
-    IdParamSchema
+    GetPostSchema
 } from '../schemas/post.schema.js';
 
 // 1. Import the OpenAPI Registry

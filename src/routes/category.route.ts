@@ -5,10 +5,10 @@ import { authorize } from '../middleware/authorize.js';
 import {validate, validateParams} from '../middleware/validate.js';
 import { UserRole } from '../entities/user.js';
 import {
+    IdParamSchema,
     CreateCategorySchema,
     GetCategorySchema,
-    UpdateCategorySchema,
-    IdParamSchema
+    UpdateCategorySchema
 } from '../schemas/category.schema.js';
 
 // 1. Import the OpenAPI Registry
@@ -69,9 +69,9 @@ categoryRegistry.registerPath({
                 },
             },
         },
-        400: {
-            description: 'Invalid ID format',
-        },
+        // 400: {
+        //     description: 'Invalid ID format',
+        // },
         404: {
             description: 'Category not found',
         },
@@ -82,19 +82,19 @@ router.get('/categories/:id',
     categoryController.getCategoryById.bind(categoryController)
 );
 
+// 4.2 Admin Routes (Admin role required)
+// Create a separate, isolated router for protected admin endpoints
+const adminRouter = Router();
 
-// 4.2 Protected routes (auth required)
-
-// Apply authentication and authorization middleware
-// to all routes below this point
-router.use(jwtAuth, authorize(UserRole.ADMIN));
+// Apply authentication and authorization middleware ONLY to this adminRouter
+adminRouter.use(jwtAuth, authorize(UserRole.ADMIN));
 
 // CREATE
 categoryRegistry.registerPath({
     method: 'post',
     path: '/categories',
     summary: 'Create a new category',
-    tags: ['Categories'],
+    tags: ['Categories - Admin'],
     security: [{ bearerAuth: [] }],
     request: {
         body: {
@@ -114,12 +114,12 @@ categoryRegistry.registerPath({
                 },
             },
         },
-        400: {
-            description: 'Invalid request data',
-        },
-        401: {
-            description: 'Unauthorized - Authentication required',
-        },
+        // 400: {
+        //     description: 'Invalid request data',
+        // },
+        // 401: {
+        //     description: 'Unauthorized - Authentication required',
+        // },
         403: {
             description: 'Forbidden - Admin access required',
         },
@@ -128,7 +128,7 @@ categoryRegistry.registerPath({
         },
     },
 });
-router.post('/categories',
+adminRouter.post('/', // The path is relative to where adminRouter is mounted
     validate(CreateCategorySchema),
     categoryController.createCategory.bind(categoryController)
 );
@@ -138,7 +138,7 @@ categoryRegistry.registerPath({
     method: 'put',
     path: '/categories/{id}',
     summary: 'Update a category',
-    tags: ['Categories'],
+    tags: ['Categories - Admin'],
     security: [{ bearerAuth: [] }],
     request: {
         params: IdParamSchema,
@@ -159,24 +159,24 @@ categoryRegistry.registerPath({
                 },
             },
         },
-        400: {
-            description: 'Invalid request data',
-        },
-        401: {
-            description: 'Unauthorized - Authentication required',
-        },
+        // 400: {
+        //     description: 'Invalid request data',
+        // },
+        // 401: {
+        //     description: 'Unauthorized - Authentication required',
+        // },
         403: {
             description: 'Forbidden - Admin access required',
         },
         404: {
             description: 'Category not found',
         },
-        409: {
-            description: 'Conflict - Another category with this name already exists',
-        },
+        // 409: {
+        //     description: 'Conflict - Another category with this name already exists',
+        // },
     },
 });
-router.put('/categories/:id',
+adminRouter.put('/:id',
     validateParams(IdParamSchema),
     validate(UpdateCategorySchema),
     categoryController.updateCategory.bind(categoryController)
@@ -187,7 +187,7 @@ categoryRegistry.registerPath({
     method: 'delete',
     path: '/categories/{id}',
     summary: 'Delete a category',
-    tags: ['Categories'],
+    tags: ['Categories - Admin'],
     security: [{ bearerAuth: [] }],
     request: {
         params: IdParamSchema,
@@ -196,12 +196,12 @@ categoryRegistry.registerPath({
         204: {
             description: 'Category deleted successfully',
         },
-        400: {
-            description: 'Invalid ID format',
-        },
-        401: {
-            description: 'Unauthorized - Authentication required',
-        },
+        // 400: {
+        //     description: 'Invalid ID format',
+        // },
+        // 401: {
+        //     description: 'Unauthorized - Authentication required',
+        // },
         403: {
             description: 'Forbidden - Admin access required',
         },
@@ -210,9 +210,13 @@ categoryRegistry.registerPath({
         },
     },
 });
-router.delete('/categories/:id',
+adminRouter.delete('/:id',
     validateParams(IdParamSchema),
     categoryController.deleteCategory.bind(categoryController)
 );
+
+// Mount the isolated admin router onto the main router
+// All routes within adminRouter will now be prefixed with /categories
+router.use('/categories', adminRouter);
 
 export default router;
