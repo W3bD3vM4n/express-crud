@@ -46,7 +46,7 @@ export class User {
     @Column({ type: 'varchar', length: 150, unique: true })
     email!: string;
 
-    @Column({ type: 'varchar', length: 200 })
+    @Column({ type: 'varchar', length: 255 })
     password!: string;
 
     @Column({ type: 'enum', enum: UserRole })

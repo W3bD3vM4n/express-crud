@@ -59,7 +59,7 @@ export class PostController {
             }
 
             const userId = req.user.userId;
-            const posts = await postService.getSpecificUserFromZod(userId);
+            const posts = await postService.getSpecificUserPostsFromZod(userId);
             res.status(200).json(posts);
         } catch (error: any) {
             res.status(500).json({ message: 'Error fetching your posts', error: error.message });

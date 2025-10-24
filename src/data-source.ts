@@ -22,7 +22,7 @@ export const AppDataSource = new DataSource({
     password: DB_PASSWORD,
     database: DB_DATABASE,
     // synchronize: true should be false in production
-    synchronize: true, // Automatically creates database schema on every application launch
+    synchronize: false, // Automatically creates database schema on every application launch
     logging: false, // Set to true to see SQL queries in the console
     entities: [Category, Post, User], // List of all your entity classes
     migrations: [],

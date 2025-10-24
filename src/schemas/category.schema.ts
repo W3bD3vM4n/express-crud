@@ -25,14 +25,12 @@ export const CategorySchema = z.object({
 });
 
 // 2. Schema: Create Category (Input)
-// Derived from the Base Schema, only including fields the user provides
 export const CreateCategorySchema = CategorySchema.pick({
     name: true,
     description: true,
 }).openapi('CreateCategoryRequest');
 
 // 3. Schema: Read Category (Output)
-// Uses the Base Schema
 export const GetCategorySchema = CategorySchema.openapi('CategoryResponse');
 
 // 4. Schema: Update Category (Input)

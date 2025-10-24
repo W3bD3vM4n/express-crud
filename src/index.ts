@@ -3,6 +3,7 @@ import { AppDataSource } from './data-source.js';
 import categoryRoutes from './routes/category.route.js';
 import postRoutes from './routes/post.route.js';
 import userRoutes from './routes/user.route.js';
+import cors from 'cors';
 
 // Swagger imports
 import swaggerUi from 'swagger-ui-express';
@@ -19,6 +20,9 @@ AppDataSource.initialize()
 
 const app = express();
 const port = 3000;
+
+// Inicializar CORS (Cross Origin Resource Sharing)
+app.use(cors());
 
 // Middleware to parse JSON bodies
 app.use(express.json());

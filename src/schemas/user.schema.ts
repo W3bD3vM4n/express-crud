@@ -29,7 +29,7 @@ export const UserSchema = z.object({
     }),
     password: z.string()
         .min(6, 'Password must be at least 6 characters')
-        .max(200)
+        .max(255)
         .openapi({
             description: 'User password (min 6 characters)',
             example: 'SecurePass123!'
@@ -56,7 +56,6 @@ export const LoginSchema = UserSchema.pick({
 }).openapi('LoginRequest');
 
 // 3. Schema: Create User (Input)
-// Derived from the Base Schema, excluding auto-generated fields
 export const CreateUserSchema = UserSchema.pick({
     firstName: true,
     lastName: true,
@@ -67,14 +66,14 @@ export const CreateUserSchema = UserSchema.pick({
 }).openapi('CreateUserRequest');
 
 // 4. Schema: Read User (Output)
-// Excludes password from response
 export const GetUserSchema = UserSchema.omit({
     password: true,
 }).openapi('UserResponse');
 
 // 5. Schema: Update User (Input)
 // Fields are made optional because a user might only want to update some
-export const UpdateUserSchema = CreateUserSchema.partial().openapi('UpdateUserRequest');
+export const UpdateUserSchema = CreateUserSchema.partial()
+    .openapi('UpdateUserRequest');
 
 // 6. Type Inference for TypeScript
 export type LoginInputZod = z.infer<typeof LoginSchema>;

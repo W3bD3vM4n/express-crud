@@ -62,7 +62,6 @@ router.get('/posts',
 );
 
 // 4.2 Protected routes (auth required)
-
 // CREATE
 postRegistry.registerPath({
     method: 'post',
@@ -164,7 +163,6 @@ router.delete('/posts/:id',
 );
 
 // 4.3 Admin Routes (Admin role required)
-
 // Apply authentication and authorization middleware
 // to all routes below this point
 const adminRouter = Router();

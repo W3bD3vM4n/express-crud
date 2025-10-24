@@ -42,7 +42,6 @@ export const PostSchema = z.object({
 });
 
 // 2. Schema: Create Post (Input)
-// Derived from the Base Schema, only including fields the user provides
 export const CreatePostSchema = PostSchema.pick({
     title: true,
     body: true,
@@ -54,7 +53,6 @@ export const CreatePostSchema = PostSchema.pick({
 }).openapi('CreatePostRequest');
 
 // 3. Schema: Read Post (Output)
-// Extends the Base Schema to include related data for a rich response
 export const GetPostSchema = PostSchema.extend({
     // Nest a simplified user object
     // Nullable in case the author's account is deleted
@@ -72,7 +70,6 @@ export const GetPostSchema = PostSchema.extend({
 }).openapi('PostResponse');
 
 // 4. Schema: Update Post (Input)
-// Fields are made optional because a user might only want to update some
 // It's not used unless you want to add admin editing later
 // export const UpdatePostSchema = CreatePostSchema.partial().openapi('UpdatePostRequest');
 

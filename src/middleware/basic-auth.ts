@@ -2,6 +2,14 @@ import { Request, Response, NextFunction } from 'express';
 import { UserService } from '../services/user.service.js';
 import bcrypt from 'bcrypt';
 
+/*
+* Basic Auth: displays a (temporary) login pop-up in the browser's
+* address bar, and an open padlock icon (until the email/password is entered).
+* To make it permanent, enter the credentials in the
+* "Authorization" button in the upper right corner to
+* enable the Update/Delete Endpoints.
+* */
+
 const userService = new UserService();
 
 export const basicAuth = async (req: Request, res: Response, next: NextFunction) => {

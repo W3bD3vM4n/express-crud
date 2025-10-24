@@ -2,6 +2,13 @@ import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { UserRole } from '../entities/user.js';
 
+/*
+* JWT: I need to log in to the login endpoint (User)
+* to obtain a token (encrypted string), and enter it in the
+* top right button labeled `Authorization` in order to
+* enable the Update/Delete endpoints.
+* */
+
 export const jwtAuth = (req: Request, res: Response, next: NextFunction) => {
     const authHeader = req.headers.authorization;
 

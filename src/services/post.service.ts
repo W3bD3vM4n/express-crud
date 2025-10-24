@@ -3,7 +3,7 @@ import { Post } from '../entities/post.js';
 import { UserRole, PostStatus } from '../entities/user.js';
 import { CreatePostZod, GetPostZod } from '../schemas/post.schema.js';
 
-const postRepository = AppDataSource.getRepository(Post);
+const postZod = AppDataSource.getRepository(Post);
 
 // Convert the Entity to the PostResponse type
 const toPostResponse = (post: Post): GetPostZod => {
@@ -28,20 +28,20 @@ const toPostResponse = (post: Post): GetPostZod => {
 
 export class PostService {
     // CREATE
-    async createFromZod(input: CreatePostZod, userId: number): Promise<GetPostZod> {
-        const post = postRepository.create({
+    async createFromZod(create: CreatePostZod, userId: number): Promise<GetPostZod> {
+        const post = postZod.create({
             // Status defaults to PENDING for Admin review
-            ...input,
+            ...create,
             userId: userId,
             status: PostStatus.PENDING,
         });
 
-        const newPost = await postRepository.save(post);
+        const newPost = await postZod.save(post);
+
         // We need to refetch to get relations
         try {
             return await this.getByIdFromZod(newPost.postId);
         } catch (error) {
-            // If we can't fetch the created post, something is seriously wrong
             throw new Error('Post created but could not be retrieved');
         }
     }
@@ -59,13 +59,13 @@ export class PostService {
             queryOptions.where.categoryId = options.categoryId;
         }
 
-        const posts = await postRepository.find(queryOptions);
+        const posts = await postZod.find(queryOptions);
         return posts.map(toPostResponse);
     }
 
     // Finds all posts by user, regardless of status
-    async getSpecificUserFromZod(userId: number): Promise<GetPostZod[]> {
-        const posts = await postRepository.find({
+    async getSpecificUserPostsFromZod(userId: number): Promise<GetPostZod[]> {
+        const posts = await postZod.find({
             where: { userId },
             relations: ['user', 'category'],
             order: { createdAt: 'DESC' },
@@ -75,18 +75,20 @@ export class PostService {
 
     // Finds a single post by its ID, ensuring relations are loaded
     async getByIdFromZod(postId: number): Promise<GetPostZod> {
-        const post = await postRepository.findOne({
+        const post = await postZod.findOne({
             where: { postId },
             relations: ['user', 'category'],
         });
-        if (!post) throw new Error('Post not found');
+        if (!post) {
+            throw new Error('Post not found');
+        }
         return toPostResponse(post);
     }
 
     // DELETE
     async deleteFromZod(postId: number, currentUserId: number, currentUserRole: UserRole): Promise<boolean> {
         // The author can be the User or the Administrator
-        const post = await postRepository.findOneBy({ postId });
+        const post = await postZod.findOneBy({ postId });
         if (!post) {
             throw new Error('Post not found');
         }
@@ -95,13 +97,13 @@ export class PostService {
             throw new Error('Forbidden: You do not have permission to delete this post.');
         }
 
-        const result = await postRepository.delete(postId);
+        const result = await postZod.delete(postId);
         return result.affected !== 0;
     }
 
     // Admin: Finds all posts pending review
     async findPending(): Promise<GetPostZod[]> {
-        const posts = await postRepository.find({
+        const posts = await postZod.find({
             where: { status: PostStatus.PENDING },
             relations: ['user', 'category'],
             order: { createdAt: 'ASC' },
@@ -111,13 +113,13 @@ export class PostService {
 
     // Admin: Approves or rejects a post
     async moderate(postId: number, newStatus: PostStatus.APPROVED | PostStatus.REJECTED): Promise<GetPostZod> {
-        const post = await postRepository.findOneBy({ postId });
+        const post = await postZod.findOneBy({ postId });
         if (!post) {
             throw new Error('Post not found');
         }
 
         post.status = newStatus;
-        const updatedPost = await postRepository.save(post);
+        const updatedPost = await postZod.save(post);
         return this.getByIdFromZod(updatedPost.postId);
     }
 }

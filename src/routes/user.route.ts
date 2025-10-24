@@ -19,10 +19,10 @@ import { z } from 'zod';
 export const userRegistry = new OpenAPIRegistry();
 
 // 3. Register the schemas (OpenAPI Documentation)
-userRegistry.register('CreateUserRequest', CreateUserSchema);
-userRegistry.register('UpdateUserRequest', UpdateUserSchema);
 userRegistry.register('LoginRequest', LoginSchema);
-userRegistry.register('UserResponse', GetUserSchema);
+userRegistry.register('CreateUserRequest', CreateUserSchema);
+userRegistry.register('GetUserResponse', GetUserSchema);
+userRegistry.register('UpdateUserRequest', UpdateUserSchema);
 
 // The entire router uses the authorize middleware
 // to ensure only admins can access these endpoints
@@ -49,7 +49,9 @@ userRegistry.registerPath({
         },
     },
 });
-router.get('/users', userController.getAllUsers.bind(userController));
+router.get('/users',
+    userController.getAllUsers.bind(userController)
+);
 
 userRegistry.registerPath({
     method: 'get',
@@ -143,6 +145,14 @@ router.post('/users/login',
     userController.login.bind(userController)
 );
 
+// Protected routes (auth required)
+// router.put('/users/:id', userController.updateUser.bind(userController));
+// router.delete('/users/:id', userController.deleteUser.bind(userController));
+
+// Seguridad: Basic Auth
+// router.put('/users/:id', basicAuth, userController.updateUser.bind(userController));
+// router.delete('/users/:id', basicAuth, userController.deleteUser.bind(userController));
+
 // 4.2 Protected routes (auth required)
 // UPDATE
 userRegistry.registerPath({
@@ -178,8 +188,6 @@ userRegistry.registerPath({
         },
     },
 });
-// router.put('/users/:id', userController.updateUser.bind(userController));
-// router.put('/users/:id', basicAuth, userController.updateUser.bind(userController));
 router.put('/users/:id',
     jwtAuth,
     validateParams(IdParamSchema),
@@ -209,8 +217,6 @@ userRegistry.registerPath({
         },
     },
 });
-// router.delete('/users/:id', userController.deleteUser.bind(userController));
-// router.delete('/users/:id', basicAuth, userController.deleteUser.bind(userController));
 router.delete('/users/:id',
     jwtAuth,
     validateParams(IdParamSchema),

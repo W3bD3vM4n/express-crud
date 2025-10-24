@@ -3,7 +3,7 @@ import { Category } from '../entities/category.js';
 import { CreateCategoryZod, GetCategoryZod, UpdateCategoryZod } from '../schemas/category.schema.js';
 import { Not } from 'typeorm';
 
-const categoryRepository = AppDataSource.getRepository(Category);
+const categoryZod = AppDataSource.getRepository(Category);
 
 // Convert the Entity to the CategoryResponse type
 const toCategoryResponse = (category: Category): GetCategoryZod => {
@@ -18,7 +18,7 @@ export class CategoryService {
     // CREATE
     async createFromZod(create: CreateCategoryZod): Promise<GetCategoryZod> {
         // Prevent duplicate category names
-        const existing = await categoryRepository.findOne({
+        const existing = await categoryZod.findOne({
             where: {
                 name: create.name
             }
@@ -38,31 +38,33 @@ export class CategoryService {
             categoryData.description = create.description;
         }
 
-        const category = categoryRepository.create(categoryData);
+        const category = categoryZod.create(categoryData);
 
-        const newCategory = await categoryRepository.save(category);
+        const newCategory = await categoryZod.save(category);
         return toCategoryResponse(newCategory);
     }
 
     // READ
     async getAllFromZod(): Promise<GetCategoryZod[]> {
-        const categories = await categoryRepository.find();
+        const categories = await categoryZod.find();
         return categories.map(toCategoryResponse);
     }
 
     async getByIdFromZod(id: number): Promise<GetCategoryZod | null> {
-        const category = await categoryRepository.findOneBy({ categoryId: id });
+        const category = await categoryZod.findOneBy({ categoryId: id });
         return category ? toCategoryResponse(category) : null;
     }
 
     // UPDATE
     async updateFromZod(id: number, update: UpdateCategoryZod): Promise<GetCategoryZod | null> {
-        const category = await categoryRepository.findOneBy({ categoryId: id });
-        if (!category) return null;
+        const category = await categoryZod.findOneBy({ categoryId: id });
+        if (!category) {
+            return null;
+        }
 
         // If name is being changed, check for uniqueness against other categories
         if (update.name) {
-            const existing = await categoryRepository.findOne({
+            const existing = await categoryZod.findOne({
                 where: {
                     name: update.name,
                     categoryId: Not(id)
@@ -88,13 +90,13 @@ export class CategoryService {
         // Merge the updates into the existing category entity
         Object.assign(category, updateData);
 
-        const updatedCategory = await categoryRepository.save(category);
+        const updatedCategory = await categoryZod.save(category);
         return toCategoryResponse(updatedCategory);
     }
 
     // DELETE
     async deleteFromZod(id: number) {
-        const result = await categoryRepository.delete(id);
+        const result = await categoryZod.delete(id);
         return result;
     }
 }
