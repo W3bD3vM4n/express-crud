@@ -17,7 +17,7 @@ export const PostSchema = z.object({
         description: 'Auto-generated post ID',
         example: 1,
     }),
-    title: z.string().min(1, 'Title is required').max(255).openapi({
+    title: z.string().min(1, 'Title is required').max(100).openapi({
         description: 'The title of the post',
         example: 'Selling Calculus Textbook',
     }),

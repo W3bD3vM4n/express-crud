@@ -14,7 +14,7 @@ export const CategorySchema = z.object({
         description: 'Auto-generated category ID',
         example: 1,
     }),
-    name: z.string().min(1, 'Name is required').max(100).openapi({
+    name: z.string().min(1, 'Name is required').max(50).openapi({
         description: 'The name of the category',
         example: 'exchange',
     }),

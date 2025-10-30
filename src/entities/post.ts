@@ -15,7 +15,7 @@ export class Post {
     @PrimaryGeneratedColumn({ name: 'post_id' })
     postId!: number;
 
-    @Column({ type: 'varchar', length: 255 })
+    @Column({ type: 'varchar', length: 100 })
     title!: string;
 
     @Column({ type: 'text' })

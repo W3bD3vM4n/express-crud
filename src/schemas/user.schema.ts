@@ -15,21 +15,21 @@ export const UserSchema = z.object({
         description: 'Auto-generated user ID',
         example: 1
     }),
-    firstName: z.string().min(1, 'First name is required').max(100).openapi({
+    firstName: z.string().min(1, 'First name is required').max(50).openapi({
         description: 'User first name',
         example: 'John'
     }),
-    lastName: z.string().min(1, 'Last name is required').max(100).openapi({
+    lastName: z.string().min(1, 'Last name is required').max(50).openapi({
         description: 'User last name',
         example: 'Doe'
     }),
-    email: z.string().email('Invalid email format').max(150).openapi({
+    email: z.string().email('Invalid email format').max(100).openapi({
         description: 'User email address',
         example: 'john.doe@example.com'
     }),
     password: z.string()
         .min(6, 'Password must be at least 6 characters')
-        .max(255)
+        .max(100)
         .openapi({
             description: 'User password (min 6 characters)',
             example: 'SecurePass123!'

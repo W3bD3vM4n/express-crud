@@ -37,16 +37,16 @@ export class User {
     @PrimaryGeneratedColumn({ name: 'user_id' })
     userId!: number;
 
-    @Column({ type: 'varchar', length: 100, name: 'first_name' })
+    @Column({ type: 'varchar', length: 50, name: 'first_name' })
     firstName!: string;
 
-    @Column({ type: 'varchar', length: 100, name: 'last_name' })
+    @Column({ type: 'varchar', length: 50, name: 'last_name' })
     lastName!: string;
 
-    @Column({ type: 'varchar', length: 150, unique: true })
+    @Column({ type: 'varchar', length: 100, unique: true })
     email!: string;
 
-    @Column({ type: 'varchar', length: 255 })
+    @Column({ type: 'varchar', length: 100 })
     password!: string;
 
     @Column({ type: 'enum', enum: UserRole })
